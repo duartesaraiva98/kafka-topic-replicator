@@ -1,6 +1,6 @@
 module github.com/duartesaraiva98/kafka-topic-replicator
 
-go 1.21.1
+go 1.21
 
 require (
 	github.com/confluentinc/confluent-kafka-go/v2 v2.2.0
