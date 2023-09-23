@@ -1,6 +1,6 @@
 # Kafka Topic Replicator
 
-| ![Static Badge](https://img.shields.io/badge/stage-development-green) |
+![Static Badge](https://img.shields.io/badge/stage-development-green)
 
 This is a simple tool that helps you with replicating messages in one kafka topic into another. It works in a single or multi cluster setup.
 
