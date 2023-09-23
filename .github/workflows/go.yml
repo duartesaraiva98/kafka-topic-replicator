@@ -24,32 +24,30 @@ jobs:
     - name: Get version
       run: echo "VERSION=$(cat src/version)" >> "$GITHUB_ENV"
 
-    - name: Build darwin-amd64
-      env:
-        GOOS: darwin
-        GOARCH: amd64
-        CGO_ENABLED: 1
-      run: go build -C src -v -o target/kafka-topic-replicator-$VERSION-$GOOS-$GOARCH
+    # - name: Build darwin-amd64
+    #   env:
+    #     GOOS: darwin
+    #     GOARCH: amd64
+    #     CGO_ENABLED: 1
+    #   run: go build -C src -v -o target/kafka-topic-replicator-$VERSION-$GOOS-$GOARCH
 
-    - name: Build darwin-arm64
+    # - name: Build darwin-arm64
+    #   env:
+    #     GOOS: darwin
+    #     GOARCH: arm64
+    #     CGO_ENABLED: 1
+    #   run: go build -C src -v -o target/kafka-topic-replicator-$VERSION-$GOOS-$GOARCH
+
+    - name: Build linux-amd64
       env:
-        GOOS: darwin
-        GOARCH: arm64
-        CGO_ENABLED: 1
+        GOOS: linux
+        GOARCH: amd64
       run: go build -C src -v -o target/kafka-topic-replicator-$VERSION-$GOOS-$GOARCH
 
     - name: Build linux-amd64
       env:
         GOOS: linux
         GOARCH: amd64
-        CGO_ENABLED: 1
-      run: go build -C src -v -o target/kafka-topic-replicator-$VERSION-$GOOS-$GOARCH
-
-    - name: Build linux-amd64
-      env:
-        GOOS: linux
-        GOARCH: amd64
-        CGO_ENABLED: 1
       run: go build -C src -v -o target/kafka-topic-replicator-$VERSION-$GOOS-$GOARCH
 
     - name: Creating a release
