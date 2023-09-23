@@ -22,7 +22,7 @@ jobs:
         go-version: '1.21'
 
     - name: Get version
-      run: echo "VERSION=$(cat src/version)" >> "$GITHUB_ENV"
+      run: echo "VERSION=$(cat src/version)" >> "$GITHUB_ENV" && git tag $VERSION && git push origin $VERSION
 
     # - name: Build darwin-amd64
     #   env:
