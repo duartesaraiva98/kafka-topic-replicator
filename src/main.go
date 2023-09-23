@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"os"
 	"time"
 
 	"github.com/duartesaraiva98/kafka-topic-replicator/configuration"
@@ -8,7 +10,14 @@ import (
 )
 
 func main() {
-	cfg := configuration.ReadConfig("/Users/duarte/Oss/kafka-topic-replicator/config.yaml")
+	filePath := os.Getenv("CONFIG_FILE")
+
+	if filePath == "" {
+		fmt.Println("`CONFIG_FILE` environment variable needs to be set and non-empty")
+		os.Exit(1)
+	}
+
+	cfg := configuration.ReadConfig(filePath)
 
 	c := replicator.StartConsumer(cfg.Source.ConsumerConfig, cfg.Source.Topic)
 	p := replicator.NewProducer(cfg.Destination.ProducerConfig)
