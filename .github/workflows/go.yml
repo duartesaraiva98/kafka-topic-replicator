@@ -24,7 +24,8 @@ jobs:
 
     - name: Install C cross compiler for arm64
       run: |
-        wget -P /cc https://ftp.gnu.org/gnu/gcc/gcc-13.2.0/gcc-13.2.0.tar.xz \
+        mkdir /cc
+        && wget -P /cc https://ftp.gnu.org/gnu/gcc/gcc-13.2.0/gcc-13.2.0.tar.xz \
         && tar xf /cc/gcc-13.2.0.tar.xz -C /cc \
         && cd /cc/gcc-13.2.0 \
         && ./configure --target=aarch64-linux-gnu --prefix=/cc \
@@ -37,12 +38,6 @@ jobs:
         GOARCH: amd64
         CGO_ENABLED: 1
       run: go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
-
-    # - name: Get current directory
-    #   run: echo "DIR=$(pwd)" >> "$GITHUB_ENV"
-
-    # - name: Get arm64 cross-compiler
-    #   run: wget -P $DIR/cc https://musl.cc/aarch64-linux-musl-cross.tgz && tar -xvf $DIR/cc/aarch64-linux-musl-cross.tgz -C $DIR/cc 
 
     - name: Build linux-arm64
       env:
