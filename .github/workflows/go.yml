@@ -13,36 +13,31 @@ on:
 jobs:
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: linux
     permissions:
       contents: write
     steps:
     - uses: actions/checkout@v3
-
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.21'
 
     - name: Build linux-amd64
       env:
         GOOS: linux
         GOARCH: amd64
         CGO_ENABLED: 1
-      run: echo $GOOS && echo $GOARCH go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
+      run: go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
 
-    - name: Get current directory
-      run: echo "DIR=$(pwd)" >> "$GITHUB_ENV"
+    # - name: Get current directory
+    #   run: echo "DIR=$(pwd)" >> "$GITHUB_ENV"
 
-    - name: Get arm64 cross-compiler
-      run: wget -P $DIR/cc https://musl.cc/aarch64-linux-musl-cross.tgz && tar -xvf $DIR/cc/aarch64-linux-musl-cross.tgz -C $DIR/cc 
+    # - name: Get arm64 cross-compiler
+    #   run: wget -P $DIR/cc https://musl.cc/aarch64-linux-musl-cross.tgz && tar -xvf $DIR/cc/aarch64-linux-musl-cross.tgz -C $DIR/cc 
 
     - name: Build linux-arm64
       env:
         GOOS: linux
         GOARCH: arm64
         CGO_ENABLED: 1
-      run: CC=$DIR/cc/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
+      run: go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
 
     - name: Print all that will be released
       run: ls src/target
