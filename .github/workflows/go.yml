@@ -23,6 +23,8 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.21'
+
+    - name: Set up dependencies
       run: go get github.com/confluentinc/confluent-kafka-go/v2 && go get github.com/spf13/viper
 
     - name: Build linux-amd64
