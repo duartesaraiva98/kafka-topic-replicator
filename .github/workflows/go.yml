@@ -21,7 +21,7 @@ jobs:
       contents: write
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Build linux-amd64
       env:
         GOOS: linux
@@ -35,11 +35,15 @@ jobs:
     # - name: Get arm64 cross-compiler
     #   run: wget -P $DIR/cc https://musl.cc/aarch64-linux-musl-cross.tgz && tar -xvf $DIR/cc/aarch64-linux-musl-cross.tgz -C $DIR/cc 
 
+    - name: Install C cross compiler for arm64
+      run: apt install gcc-aarch64-linux-gnu
+
     - name: Build linux-arm64
       env:
         GOOS: linux
         GOARCH: arm64
         CGO_ENABLED: 1
+        CC: gcc-aarch64-linux-gnu
       run: go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
 
     - name: Print all that will be released
