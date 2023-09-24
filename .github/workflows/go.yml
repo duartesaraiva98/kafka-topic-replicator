@@ -42,8 +42,7 @@ jobs:
         GOOS: linux
         GOARCH: arm64
         CGO_ENABLED: 1
-        CC: $DIR/cc/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc
-      run: go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
+      run: CC=$DIR/cc/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
 
     - name: Print all that will be released
       run: ls src/target
