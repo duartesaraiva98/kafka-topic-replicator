@@ -31,16 +31,16 @@ jobs:
       env:
         GOOS: linux
         GOARCH: amd64
-      run: go build -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
+      run: go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
 
     - name: Build linux-arm64
       env:
         GOOS: linux
         GOARCH: arm64
-      run: go build -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
+      run: go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
 
     - name: Print all that will be released
-      run: ls target
+      run: ls src/target
 
     # - name: Creating a release
     #   uses: ncipollo/release-action@v1
