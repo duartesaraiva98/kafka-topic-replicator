@@ -5,6 +5,8 @@ name: Go
 
 on: 
   push:
+    branches:
+    - 'main'
     tags:
     - '*'
 
@@ -21,6 +23,7 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.21'
+      run: go get github.com/confluentinc/confluent-kafka-go/v2 && go get github.com/spf13/viper
 
     - name: Build linux-amd64
       env:
@@ -34,7 +37,10 @@ jobs:
         GOARCH: arm64
       run: go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
 
-    - name: Creating a release
-      uses: ncipollo/release-action@v1
-      with:
-        artifacts: "src/target/*"
+    - name: Print all that will be released
+      run: ls src/target
+
+    # - name: Creating a release
+    #   uses: ncipollo/release-action@v1
+    #   with:
+    #     artifacts: "src/target/*"
