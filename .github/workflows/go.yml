@@ -29,13 +29,17 @@ jobs:
         GOOS: linux
         GOARCH: amd64
         CGO_ENABLED: 1
-      run: go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
+      run: echo $GOOS && echo $GOARCH go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
+
+    - name: Get arm64 cross-compiler
+      run: wget -P ./cc https://musl.cc/aarch64-linux-musl-cross.tgz && tar -xvf ./cc/aarch64-linux-musl-cross.tgz -C ~ 
 
     - name: Build linux-arm64
       env:
         GOOS: linux
         GOARCH: arm64
         CGO_ENABLED: 1
+        CC: ./cc/aarch64-linux-musl-cross/bin/aarch64-linux-musl-gcc
       run: go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
 
     - name: Print all that will be released
