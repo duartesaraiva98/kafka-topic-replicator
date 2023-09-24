@@ -35,7 +35,7 @@ jobs:
       run: echo "DIR=$(pwd)" >> "$GITHUB_ENV"
 
     - name: Get arm64 cross-compiler
-      run: wget -P $DIR/cc https://musl.cc/aarch64-linux-musl-cross.tgz && tar -xvf $DIR/cc/aarch64-linux-musl-cross.tgz -C ~ 
+      run: wget -P $DIR/cc https://musl.cc/aarch64-linux-musl-cross.tgz && tar -xvf $DIR/cc/aarch64-linux-musl-cross.tgz -C $DIR/cc 
 
     - name: Build linux-arm64
       env:
