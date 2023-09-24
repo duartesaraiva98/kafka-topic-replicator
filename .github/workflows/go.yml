@@ -27,7 +27,7 @@ jobs:
 
     - name: Install C cross compiler for arm64
       run: |
-        mkdir $WORKSPACE/cc
+        mkdir $WORKSPACE/cc \
         && wget -P $WORKSPACE/cc https://ftp.gnu.org/gnu/gcc/gcc-13.2.0/gcc-13.2.0.tar.xz \
         && tar xf $WORKSPACE/cc/gcc-13.2.0.tar.xz -C $WORKSPACE/cc \
         && cd $WORKSPACE/cc/gcc-13.2.0 \
