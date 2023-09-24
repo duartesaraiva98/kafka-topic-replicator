@@ -25,22 +25,22 @@ jobs:
         go-version: '1.21'
 
     - name: Set up dependencies
-      run: go get github.com/confluentinc/confluent-kafka-go/v2 && go get github.com/spf13/viper
+      run: cd src && go get github.com/confluentinc/confluent-kafka-go/v2 && go get github.com/spf13/viper
 
     - name: Build linux-amd64
       env:
         GOOS: linux
         GOARCH: amd64
-      run: go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
+      run: go build -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
 
     - name: Build linux-arm64
       env:
         GOOS: linux
         GOARCH: arm64
-      run: go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
+      run: go build -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
 
     - name: Print all that will be released
-      run: ls src/target
+      run: ls target
 
     # - name: Creating a release
     #   uses: ncipollo/release-action@v1
