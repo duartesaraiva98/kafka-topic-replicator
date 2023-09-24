@@ -24,8 +24,8 @@ jobs:
 
     - name: Install C cross compiler for arm64
       run: |
-        wget -P /cc/gcc-13.2.0.tar.xz https://ftp.gnu.org/gnu/gcc/gcc-13.2.0/gcc-13.2.0.tar.xz \
-        && tar xf /cc/gcc-13.2.0.tar.xz -C /cc/gcc-13.2.0 \
+        wget -P /cc https://ftp.gnu.org/gnu/gcc/gcc-13.2.0/gcc-13.2.0.tar.xz \
+        && tar xf /cc/gcc-13.2.0.tar.xz -C /cc \
         && cd /cc/gcc-13.2.0 \
         && ./configure --target=aarch64-linux-gnu --prefix=/cc \
         && make -j4 && make install \
