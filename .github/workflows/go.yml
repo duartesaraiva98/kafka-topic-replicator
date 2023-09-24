@@ -36,7 +36,7 @@ jobs:
     #   run: wget -P $DIR/cc https://musl.cc/aarch64-linux-musl-cross.tgz && tar -xvf $DIR/cc/aarch64-linux-musl-cross.tgz -C $DIR/cc 
 
     - name: Install C cross compiler for arm64
-      run: sudo apt install gcc-aarch64-linux-gnu
+      run: apt-get install gcc-aarch64-linux-gnu
 
     - name: Build linux-arm64
       env:
