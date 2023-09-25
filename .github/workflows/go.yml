@@ -5,6 +5,8 @@ name: Go
 
 on: 
   push:
+    branches:
+    - "master"
     tags:
     - '*'
 
@@ -15,8 +17,6 @@ jobs:
     container:
       image: ghcr.io/goreleaser/goreleaser-cross
       options: --user 1001
-    permissions:
-      contents: write
     steps:
     - uses: actions/checkout@v3
 
@@ -32,9 +32,75 @@ jobs:
         GOOS: linux
         GOARCH: arm64
         CGO_ENABLED: 1
-      run: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
+        CC: aarch64-linux-gnu-gcc
+        CXX: aarch64-linux-gnu-g++
+      run: go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
+
+    - name: Cache executables
+      id: cache-executables
+      uses: actions/cache@v3
+      with:
+          path: ${{ env.GITHUB_WORKSPACE }}/src/target
+          key: executables
+    
+    - name: Cache containerfile
+      id: cache-containerfile
+      uses: actions/cache@v3
+      with:
+          path: ${{ env.GITHUB_WORKSPACE }}/Containerfile
+          key: containerfile
+
+  release:
+    runs-on: ubuntu-22.04
+    needs: build
+    permissions:
+      contents: write
+    steps:
+    - name: Restore cached executables
+      id: cache-executables-restore
+      uses: actions/cache/restore@v3
+      with:
+        path: ${{ env.GITHUB_WORKSPACE }}/src/target
+        key: executables
 
     - name: Creating a release
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "src/target/*"
+        artifacts: "${{ env.GITHUB_WORKSPACE }}/src/target/*"
+
+  package:
+    runs-on: ubuntu-22.04
+    needs: build
+    steps:
+    - name: Find version
+      run: echo "version=$(git describe --tags)" >> "$GITHUB_ENV"
+
+    - name: Restore cached executables
+      id: cache-executables-restore
+      uses: actions/cache/restore@v3
+      with:
+        path: ${{ env.GITHUB_WORKSPACE }}/src/target
+        key: executables
+
+    - name: Restore cached containerfile
+      id: cache-executables-restore
+      uses: actions/cache/restore@v3
+      with:
+        path: ${{ env.GITHUB_WORKSPACE }}/Containerfile
+        key: containerfile
+
+    - name: Buildah Action
+      id: build-image
+      uses: redhat-actions/buildah-build@v2
+      with:
+        image: kafka-topic-replicator
+        tags: ${{ env.version }} latest
+        containerfiles: |
+          .${{ env.GITHUB_WORKSPACE }}/Containerfile
+
+    - name: Push packages
+      uses: redhat-actions/push-to-registry@v2
+      with:
+        image: ${{ steps.build-image.outputs.image }}
+        tags: ${{ steps.build-image.outputs.tags }}
+        registry: ghcr.io/duartesaraiva98
