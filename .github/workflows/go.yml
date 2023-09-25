@@ -15,25 +15,12 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     container:
-      image: golang:1.21.1
+      image: ghcr.io/goreleaser/goreleaser-cross
       options: --user 1001
     permissions:
       contents: write
     steps:
     - uses: actions/checkout@v3
-
-    - name: Define workspace directory as env var
-      run: echo "WORKSPACE=$(pwd)" >> "$GITHUB_ENV"
-
-    - name: Install C cross compiler for arm64
-      run: |
-        mkdir $WORKSPACE/cc \
-        && wget -P $WORKSPACE/cc https://ftp.gnu.org/gnu/gcc/gcc-13.2.0/gcc-13.2.0.tar.xz \
-        && tar xf $WORKSPACE/cc/gcc-13.2.0.tar.xz -C $WORKSPACE/cc \
-        && cd $WORKSPACE/cc/gcc-13.2.0 \
-        && ./configure --target=aarch64-linux-gnu --prefix=$WORKSPACE/cc \
-        && make -j4 && make install \
-        && $WORKSPACE/cc/aarch64-linux-gnu-gcc --version
 
     - name: Build linux-amd64
       env:
@@ -47,7 +34,7 @@ jobs:
         GOOS: linux
         GOARCH: arm64
         CGO_ENABLED: 1
-      run: CC=$WORKSPACE/cc/aarch64-linux-gnu-gcc go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
+      run: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
 
     - name: Print all that will be released
       run: ls src/target
