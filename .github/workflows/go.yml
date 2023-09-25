@@ -29,6 +29,29 @@ jobs:
       id: versioning
       run: echo "version=$(git describe --tags)" >> "$GITHUB_OUTPUT"
 
+    - name: Find go-build cache
+      run: echo "go_build_cache=$(go env GOCACHE)" >> "$GITHUB_ENV"
+
+    - name: Cache go build
+      uses: actions/cache@v3
+      with:
+        path: ${{ env.go_build_cache }}
+        key: go-build-cache
+
+    - name: Cache executables
+      id: cache-executables
+      uses: actions/cache@v3
+      with:
+          path: /executables
+          key: executables
+    
+    - name: Cache containerfile
+      id: cache-containerfile
+      uses: actions/cache@v3
+      with:
+          path: /containerfile
+          key: containerfile
+
     - name: Build linux-amd64
       env:
         GOOS: linux
@@ -45,19 +68,11 @@ jobs:
         CXX: aarch64-linux-gnu-g++
       run: go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
 
-    - name: Cache executables
-      id: cache-executables
-      uses: actions/cache@v3
-      with:
-          path: ${{ env.GITHUB_WORKSPACE }}/src/target
-          key: executables
-    
-    - name: Cache containerfile
-      id: cache-containerfile
-      uses: actions/cache@v3
-      with:
-          path: ${{ env.GITHUB_WORKSPACE }}/Containerfile
-          key: containerfile
+    - name: Add containerfile to cache
+      run: mkdir /containerfile && cp ${{ env.GITHUB_WORKSPACE }}/Containerfile /containerfile/Containerfile
+
+    - name: Add executables to cache
+      run: mv ${{ env.GITHUB_WORKSPACE }}/src/targer /executables
 
   release:
     runs-on: ubuntu-22.04
@@ -65,12 +80,12 @@ jobs:
     permissions:
       contents: write
     steps:
-    - name: Restore cached executables
-      id: cache-executables-restore
-      uses: actions/cache/restore@v3
-      with:
-        path: ${{ env.GITHUB_WORKSPACE }}/src/target
-        key: executables
+    # - name: Restore cached executables
+    #   id: cache-executables-restore
+    #   uses: actions/cache/restore@v3
+    #   with:
+    #     path: ${{ env.GITHUB_WORKSPACE }}/src/target
+    #     key: executables
 
     - name: Creating a release
       uses: ncipollo/release-action@v1
