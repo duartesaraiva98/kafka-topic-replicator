@@ -4,4 +4,4 @@ ARG TARGETARCH
 
 COPY src/target/kafka-topic-replicator-linux-$TARGETARCH /app/kafka-topic-replicator
 
-CMD ["kafka-topic-replicator"]
+CMD ["/app/kafka-topic-replicator"]
