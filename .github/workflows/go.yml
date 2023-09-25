@@ -5,8 +5,6 @@ name: Go
 
 on: 
   push:
-    branches:
-    - 'main'
     tags:
     - '*'
 
@@ -36,10 +34,7 @@ jobs:
         CGO_ENABLED: 1
       run: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
 
-    - name: Print all that will be released
-      run: ls src/target
-
-    # - name: Creating a release
-    #   uses: ncipollo/release-action@v1
-    #   with:
-    #     artifacts: "src/target/*"
+    - name: Creating a release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "src/target/*"
