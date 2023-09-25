@@ -15,7 +15,7 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/goreleaser/goreleaser-cross
+      image: ghcr.io/goreleaser/goreleaser-cross:1.21.1
       options: --user 1001
     outputs:
       version: ${{ steps.versioning.outputs.version }}
@@ -25,32 +25,23 @@ jobs:
     - name: Print path
       run: pwd && echo $GITHUB_WORKSPACE
 
-    - name: Find version
-      id: versioning
-      run: echo "version=$(git describe --tags)" >> "$GITHUB_OUTPUT"
+    - name: Get go version
+      id: go_versioning
+      run: echo "::set-output name=version::$(go version | AWK '{print $3}')"
 
     - name: Find go-build cache
-      run: echo "go_build_cache=$(go env GOCACHE)" >> "$GITHUB_ENV"
+      id: go_cache
+      run: echo "::set-output name=dir::$(go env GOCACHE)"
+
+    - name: Get release version
+      id: versioning
+      run: echo "::set-output name=version::$(git describe --tags)"
 
     - name: Cache go build
       uses: actions/cache@v3
       with:
-        path: ${{ env.go_build_cache }}
-        key: go-build-cache
-
-    - name: Cache executables
-      id: cache-executables
-      uses: actions/cache@v3
-      with:
-          path: /executables
-          key: executables
-    
-    - name: Cache containerfile
-      id: cache-containerfile
-      uses: actions/cache@v3
-      with:
-          path: /containerfile
-          key: containerfile
+        path: ${{ steps.go_cache.outputs.dir }}
+        key: ${{ runner.os }}-go_cache-${{ hashFiles('src/go.sum') }}-${{ steps.go_versioning.version }}
 
     - name: Build linux-amd64
       env:
@@ -68,11 +59,10 @@ jobs:
         CXX: aarch64-linux-gnu-g++
       run: go build -C src -v -o target/kafka-topic-replicator-$GOOS-$GOARCH
 
-    - name: Add containerfile to cache
-      run: mkdir /containerfile && cp ${{ env.GITHUB_WORKSPACE }}/Containerfile /containerfile/Containerfile
-
-    - name: Add executables to cache
-      run: mv ${{ env.GITHUB_WORKSPACE }}/src/targer /executables
+    - uses: actions/upload-artifact@v3
+      with:
+        name: executables
+        path: ${{ env.GITHUB_WORKSPACE }}/src/target/
 
   release:
     runs-on: ubuntu-22.04
@@ -80,36 +70,28 @@ jobs:
     permissions:
       contents: write
     steps:
-    # - name: Restore cached executables
-    #   id: cache-executables-restore
-    #   uses: actions/cache/restore@v3
-    #   with:
-    #     path: ${{ env.GITHUB_WORKSPACE }}/src/target
-    #     key: executables
+    - uses: actions/download-artifact@v3
+      with:
+        name: executables
 
     - name: Creating a release
       uses: ncipollo/release-action@v1
       with:
-        artifacts: "${{ env.GITHUB_WORKSPACE }}/src/target/*"
+        artifacts: "${{ env.GITHUB_WORKSPACE }}/executables/*"
         tag: ${{ needs.build.outputs.version }}
 
   package:
     runs-on: ubuntu-22.04
     needs: build
     steps:
-    - name: Restore cached executables
-      id: cache-executables-restore
-      uses: actions/cache/restore@v3
+    - uses: actions/download-artifact@v3
       with:
-        path: ${{ env.GITHUB_WORKSPACE }}/src/target
-        key: executables
+        name: executables
 
-    - name: Restore cached containerfile
-      id: cache-containerfile-restore
-      uses: actions/cache/restore@v3
+    - uses: actions/checkout@v4
       with:
-        path: ${{ env.GITHUB_WORKSPACE }}/Containerfile
-        key: containerfile
+        sparse-checkout: |
+          Containerfile
 
     - name: Buildah Action
       id: build-image
@@ -118,7 +100,7 @@ jobs:
         image: kafka-topic-replicator
         tags: ${{ needs.build.outputs.version }} latest
         containerfiles: |
-          .${{ env.GITHUB_WORKSPACE }}/Containerfile
+          ./Containerfile
 
     - name: Push packages
       uses: redhat-actions/push-to-registry@v2
