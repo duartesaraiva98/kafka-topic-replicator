@@ -87,14 +87,14 @@ jobs:
     runs-on: ubuntu-22.04
     needs: build
     steps:
-    - uses: actions/download-artifact@v3
-      with:
-        name: executables
-
     - uses: actions/checkout@v4
       with:
         sparse-checkout: |
           Containerfile
+          
+    - uses: actions/download-artifact@v3
+      with:
+        name: executables
 
     - name: Buildah Action
       id: build-image
