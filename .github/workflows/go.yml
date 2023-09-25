@@ -22,8 +22,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Print env
-      run: env
+    - name: Print path
+      run: pwd && echo $GITHUB_WORKSPACE
 
     - name: Find version
       id: versioning
