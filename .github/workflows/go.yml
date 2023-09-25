@@ -27,15 +27,15 @@ jobs:
 
     - name: Get go version
       id: go_versioning
-      run: echo "::set-output name=version::$(go version | AWK '{print $3}')"
+      run: echo "version=$(go version | AWK '{print $3}')" >> $GITHUB_OUTPUT
 
     - name: Find go-build cache
       id: go_cache
-      run: echo "::set-output name=dir::$(go env GOCACHE)"
+      run: echo "dir=$(go env GOCACHE)" >> $GITHUB_OUTPUT
 
     - name: Get release version
       id: versioning
-      run: echo "::set-output name=version::$(git describe --tags)"
+      run: echo "version=$(git describe --tags)" >> $GITHUB_OUTPUT
 
     - name: Cache go build
       uses: actions/cache@v3
@@ -62,7 +62,8 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: executables
-        path: ${{ env.GITHUB_WORKSPACE }}/src/target/
+        path: src/target/
+        if-no-files-found: error
 
   release:
     runs-on: ubuntu-22.04
