@@ -87,7 +87,7 @@ jobs:
         key: executables
 
     - name: Restore cached containerfile
-      id: cache-executables-restore
+      id: cache-containerfile-restore
       uses: actions/cache/restore@v3
       with:
         path: ${{ env.GITHUB_WORKSPACE }}/Containerfile
