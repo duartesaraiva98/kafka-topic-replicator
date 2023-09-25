@@ -6,7 +6,7 @@ name: Go
 on: 
   push:
     branches:
-    - "master"
+    - "main"
     tags:
     - '*'
 
@@ -17,8 +17,14 @@ jobs:
     container:
       image: ghcr.io/goreleaser/goreleaser-cross
       options: --user 1001
+    outputs:
+      version: ${{ steps.versioning.outputs.version }}
     steps:
     - uses: actions/checkout@v3
+
+    - name: Find version
+      id: versioning
+      run: echo "version=$(git describe --tags)" >> "$GITHUB_OUTPUT"
 
     - name: Build linux-amd64
       env:
@@ -67,14 +73,12 @@ jobs:
       uses: ncipollo/release-action@v1
       with:
         artifacts: "${{ env.GITHUB_WORKSPACE }}/src/target/*"
+        tag: ${{ needs.build.outputs.version }}
 
   package:
     runs-on: ubuntu-22.04
     needs: build
     steps:
-    - name: Find version
-      run: echo "version=$(git describe --tags)" >> "$GITHUB_ENV"
-
     - name: Restore cached executables
       id: cache-executables-restore
       uses: actions/cache/restore@v3
@@ -94,7 +98,7 @@ jobs:
       uses: redhat-actions/buildah-build@v2
       with:
         image: kafka-topic-replicator
-        tags: ${{ env.version }} latest
+        tags: ${{ needs.build.outputs.version }} latest
         containerfiles: |
           .${{ env.GITHUB_WORKSPACE }}/Containerfile
 
