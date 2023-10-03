@@ -81,7 +81,7 @@ jobs:
     - name: Creating a release
       uses: ncipollo/release-action@v1
       with:
-        artifacts: ${{ steps.download.outputs.download-path }}/executables/*
+        artifacts: ${{ steps.download.outputs.download-path }}/*
         tag: ${{ needs.build.outputs.version }}
 
   # package:
