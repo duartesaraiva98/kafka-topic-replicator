@@ -108,6 +108,7 @@ jobs:
         image: kafka-topic-replicator
         tags: ${{ needs.build.outputs.version }} latest
         archs: amd64,arm64
+        platforms: linux
         build-args: |
           PATH_TO_EXECUTABLE=${{ steps.download.outputs.download-path }}
         containerfiles: |
