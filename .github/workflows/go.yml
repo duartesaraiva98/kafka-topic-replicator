@@ -97,6 +97,9 @@ jobs:
       id: download
       with:
         name: executables
+    
+    - name: List directory and contents
+      run: pwd && ls
 
     - name: Buildah Action
       id: build-image
