@@ -84,32 +84,35 @@ jobs:
         artifacts: ${{ steps.download.outputs.download-path }}/*
         tag: ${{ needs.build.outputs.version }}
 
-  # package:
-  #   runs-on: ubuntu-22.04
-  #   needs: build
-  #   steps:
-  #   - uses: actions/checkout@v4
-  #     with:
-  #       sparse-checkout: |
-  #         Containerfile
+  package:
+    runs-on: ubuntu-22.04
+    needs: build
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        sparse-checkout: |
+          Containerfile
           
-  #   - uses: actions/download-artifact@v3
-  #     id: download
-  #     with:
-  #       name: executables
+    - uses: actions/download-artifact@v3
+      id: download
+      with:
+        name: executables
 
-  #   - name: Buildah Action
-  #     id: build-image
-  #     uses: redhat-actions/buildah-build@v2
-  #     with:
-  #       image: kafka-topic-replicator
-  #       tags: ${{ needs.build.outputs.version }} latest
-  #       containerfiles: |
-  #         ./Containerfile
+    - name: Buildah Action
+      id: build-image
+      uses: redhat-actions/buildah-build@v2
+      with:
+        image: kafka-topic-replicator
+        tags: ${{ needs.build.outputs.version }} latest
+        archs: amd64,arm64
+        build-args: |
+          PATH_TO_EXECUTABLE=${{ steps.download.outputs.download-path }}
+        containerfiles: |
+          ./Containerfile
 
-  #   - name: Push packages
-  #     uses: redhat-actions/push-to-registry@v2
-  #     with:
-  #       image: ${{ steps.build-image.outputs.image }}
-  #       tags: ${{ steps.build-image.outputs.tags }}
-  #       registry: ghcr.io/duartesaraiva98
+    - name: Push packages
+      uses: redhat-actions/push-to-registry@v2
+      with:
+        image: ${{ steps.build-image.outputs.image }}
+        tags: ${{ steps.build-image.outputs.tags }}
+        registry: ghcr.io/duartesaraiva98
