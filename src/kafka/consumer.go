@@ -15,8 +15,8 @@ import (
 	}
 */
 
-func StartConsumer(config *kafka.ConfigMap, topic string) *kafka.Consumer {
-	c, err := kafka.NewConsumer(config)
+func StartConsumer(config kafka.ConfigMap, topic string) *kafka.Consumer {
+	c, err := kafka.NewConsumer(&config)
 
 	if err != nil {
 		panic(err)

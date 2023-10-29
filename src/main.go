@@ -19,11 +19,11 @@ func main() {
 
 	cfg := configuration.ReadConfig(filePath)
 
-	c := replicator.StartConsumer(cfg.Source.ConsumerConfig, cfg.Source.Topic)
-	p := replicator.NewProducer(cfg.Destination.ProducerConfig)
+	c := replicator.StartConsumer(cfg.SourceClientConfiguration(), cfg.SourceTopic())
+	p := replicator.NewProducer(cfg.DestinationClientConfiguration())
 
 	for {
-		if !replicator.PipeTo(c, p, cfg.Destination.Topic) {
+		if !replicator.PipeTo(c, p, cfg.DestinationTopic()) {
 			break
 		}
 	}
