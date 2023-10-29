@@ -4,6 +4,6 @@ ARG TARGETARCH
 
 ARG PATH_TO_EXECUTABLE
 
-COPY kafka-topic-replicator-linux-$TARGETARCH /app/kafka-topic-replicator
+COPY kafka-topic-replicator-linux-$TARGETARCH /opt/kafka-topic-replicator
 
-CMD ["/app/kafka-topic-replicator"]
+CMD ["/opt/kafka-topic-replicator"]

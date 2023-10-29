@@ -1,0 +1,22 @@
+multiCluter: false
+
+bootstrapServers: localhost:9092
+
+# kafka client properties
+client:
+  security.protocol: SASL_SSL
+  sasl.mechanism: AWS_MSK_IAM
+  sasl.jaas.config: software.amazon.msk.auth.iam.IAMLoginModule required;
+  sasl.client.callback.handler.class: software.amazon.msk.auth.iam.IAMClientCallbackHandler
+
+source:
+  # consumer configuration
+  consumer:
+    topic: topic1
+    groupId: topic-replicator
+    resetStrategy: earliest
+
+destination:
+  # producer configuration
+  producer:
+    topic: topic2
